@@ -496,6 +496,18 @@ define(function(require, exports, module) {
     }
   }
 
+  function verifyMessage(message, pubKey, callback) {
+    try {
+      var result = openpgp.verifyClearSignedMessage([pubKey], message);
+      callback(null, result);
+    } catch (e) {
+      callback({
+        type: 'error',
+        message: 'Could not verify this message'
+      });
+    }
+  }
+
   function getWatchList() {
     return mvelo.storage.get('mailvelopeWatchList');
   }
