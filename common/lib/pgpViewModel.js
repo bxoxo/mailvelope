@@ -533,6 +533,7 @@ define(function(require, exports, module) {
   exports.unlockKey = unlockKey;
   exports.encryptMessage = encryptMessage;
   exports.signMessage = signMessage;
+  exports.signMessage = verifyMessage;
   exports.getWatchList = getWatchList;
   exports.setWatchList = setWatchList;
   exports.getHostname = getHostname;
