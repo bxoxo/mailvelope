@@ -42,7 +42,7 @@ body {
   margin: 20px;
 }
 
-.primaryKey label, .subkeys label, .userids label
+.primaryKey label, .subkeys label, .userids label, .attributes label
 {
   display:inline-block;
   width:120px;
@@ -50,7 +50,7 @@ body {
   font-weight:bold;
 }
 
-.subkeys > div, .userids > div  {
+.subkeys > div, .userids > div, .attributes > div  {
   margin: 20px 40px;
 }
 
