@@ -83,6 +83,15 @@
     }
   };
 
+  var attributeSchema = {
+    model: {
+      fields: {
+        tag: tag,
+        content: content
+      }
+    }
+  };
+
   var signerSchema = {
     model: {
       fields: {
@@ -204,6 +213,7 @@
       //console.log('keyGrid key details received', details);
       e.data.subkeys = details.subkeys;
       e.data.users = details.users;
+      e.data.attributes = details.attributes;
       detailInit(e);
     });
   }
@@ -212,6 +222,7 @@
     //console.log('detailInit');
     var detailRow = e.detailRow;
 
+    /* Subkeys */
     var subkeyID = detailRow.find(".subkeyID").kendoDropDownList({
       dataTextField: "id",
       dataValueField: "id",
@@ -223,20 +234,21 @@
       index: 0
     });
 
-    var template = kendo.template($("#subkeyDetails").html());
+    var subkeyTemplate = kendo.template($("#subkeyDetails").html());
     var subkeyDetails = detailRow.find(".subkeyDetails");
     var firstSubKey = subkeyID.data("kendoDropDownList").dataItem(0); // e.data.subkeys[0] can't be used as dates are not mapped
     if (firstSubKey) {
-      subkeyDetails.html(template(firstSubKey));
+      subkeyDetails.html(subkeyTemplate(firstSubKey));
     } else {
       subkeyDetails.html('<li>No subkeys available</li>');
     }
 
     function onSubkeySelect(e) {
       var dataItem = this.dataItem(e.item.index());
-      subkeyDetails.html(template(dataItem));
+      subkeyDetails.html(subkeyTemplate(dataItem));
     }
 
+    /* User IDs */
     var useridDdl = detailRow.find(".userID");
 
     useridDdl.width(300);
@@ -285,6 +297,31 @@
       }));
     }
 
+    /* Attributes */
+    var subkeyID = detailRow.find(".attributeTag").kendoDropDownList({
+      dataTextField: "tag",
+      dataValueField: "tag",
+      dataSource: {
+        data: e.data.attributes,
+        schema: attributeSchema
+      },
+      select: onAttibuteSelect,
+      index: 0
+    });
+
+    var attributeTemplate = kendo.template($("#attributeDetails").html());
+    var attributeDetails = detailRow.find(".attributeDetails");
+    var firstAttribute = subkeyID.data("kendoDropDownList").dataItem(0); // e.data.attributes[0] can't be used as dates are not mapped
+    if (firstAttribute) {
+      subkeyDetails.html(attributeTemplate(firstAttribute));
+    } else {
+      subkeyDetails.html('<li>No attributes available</li>');
+    }
+
+    function onAttributeSelect(e) {
+      var dataItem = this.dataItem(e.item.index());
+      attributeDetails.html(attributeTemplate(dataItem));
+    }
   }
 
   $(document).ready(init);
