@@ -107,6 +107,8 @@ define(function(require, exports, module) {
       mapSubKeys(key.subKeys, details);
       // users
       mapUsers(key.users, details);
+      // user attributes
+      mapAttributes(key.users, details);
       return details;
     } else {
       throw new Error('Key with this fingerprint not found: ', guid);
@@ -119,17 +121,6 @@ define(function(require, exports, module) {
   exports.getPublicKeys = getPublicKeys;
   exports.getPrivateKeys = getPrivateKeys;
   exports.getKeyDetails = getKeyDetails;
-
-  function mapAttributes(subkeys, toKey) {
-    toKey.attrbutes = [];
-    attributes && attributes.forEach(function(attributes){
-      try {
-
-      } catch (e) {
-        console.log('Exception in mapAttributes', e);
-      }
-    });
-  }
 
   function mapSubKeys(subkeys, toKey) {
     toKey.subkeys = [];
@@ -184,6 +175,32 @@ define(function(require, exports, module) {
         toKey.users.push(uiUser);
       } catch (e) {
         console.log('Exception in mapUsers', e);
+      }
+    });
+  }
+
+  function mapAttributes(users, toKey) {
+    toKey.attributes = [];
+    users && users.filter(function(user) {return user.userAttribute != null;}).forEach(function(user) {
+      try {
+        user.userAttribute.attributes.forEach(function(attribute) {
+          var uiAttribute = {};
+
+          uiAttribute.tag = attribute.tag;
+          if (attribute.tag == 1) {
+            uiAttribute.tagName = "Image";
+          } else if (attribute.tag == 100) {
+            uiAttribute.tagName = "BTC";
+          } else {
+            uiAttribute.tagName = "Unknown";
+          };
+          
+          uiAttribute.content = attribute.content;
+          toKey.attributes.push(uiAttribute);
+          console.log("Added uiAttribute", uiAttribute);
+        });
+      } catch (e) {
+        console.log('Exception in mapAttributes', e);
       }
     });
   }
