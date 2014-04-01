@@ -93,6 +93,16 @@
     }
   };
 
+  // var attributeSchema = {
+  //   model: {
+  //     fields: {
+  //       signer: { type: "string" },
+  //       id: { type: "string" },
+  //       crDate: { type: "date" }
+  //     }
+  //   }
+  // };
+
   function init() {
     $('#displayKeys').addClass('spinner');
     keyRing.viewModel('getKeys', initGrid);
@@ -174,12 +184,15 @@
         } else {
           $('#exportPrivate, #exportKeyPair').removeClass('disabled');
         }
+        /*
         // keys longer than 1600 chars don't fit into URL
+        console.log(selKey);
         if (selKey.armoredPublic.length > 1600) {
           $('#exportByMail').addClass('disabled');
         } else {
           $('#exportByMail').removeClass('disabled');
         }
+        */
       } else {
         $('#exportBtn').addClass('disabled');
       }
@@ -290,10 +303,11 @@
 
     /* Attributes */
     var attributeTag = detailRow.find(".attributeTag").kendoDropDownList({
-      dataTextField: "tag",
+      dataTextField: "tagName",
       dataValueField: "tag",
       dataSource: {
         data: e.data.attributes
+        // schema: attributeSchema
       },
       select: onAttributeSelect,
       index: 0
@@ -304,14 +318,25 @@
     var firstAttribute = attributeTag.data("kendoDropDownList").dataItem(0); // e.data.attributes[0] can't be used as dates are not mapped
     console.log(firstAttribute);
     if (firstAttribute) {
-      attributeDetails.html(attributeTemplate(firstAttribute));
+      if (firstAttribute.data) {
+        var data = JSON.stringify(firstAttribute.data);
+        attributeDetails.html(attributeTemplate({content: data}));
+      } else {
+        attributeDetails.html(attributeTemplate(firstAttribute));
+      }
     } else {
       attributeDetails.html('<em>No attributes available</em>');
     }
 
     function onAttributeSelect(e) {
       var dataItem = this.dataItem(e.item.index());
-      attributeDetails.html(attributeTemplate(dataItem));
+      if (dataItem.data) {
+        var data = JSON.stringify(dataItem.data);
+        attributeDetails.html(attributeTemplate({content: data}));
+      } else {
+        attributeDetails.html(attributeTemplate(dataItem));
+      }
+
     }
   }
 
