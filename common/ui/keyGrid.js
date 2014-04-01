@@ -83,15 +83,6 @@
     }
   };
 
-  var attributeSchema = {
-    model: {
-      fields: {
-        tag: tag,
-        content: content
-      }
-    }
-  };
-
   var signerSchema = {
     model: {
       fields: {
@@ -298,24 +289,24 @@
     }
 
     /* Attributes */
-    var subkeyID = detailRow.find(".attributeTag").kendoDropDownList({
+    var attributeTag = detailRow.find(".attributeTag").kendoDropDownList({
       dataTextField: "tag",
       dataValueField: "tag",
       dataSource: {
-        data: e.data.attributes,
-        schema: attributeSchema
+        data: e.data.attributes
       },
-      select: onAttibuteSelect,
+      select: onAttributeSelect,
       index: 0
     });
 
     var attributeTemplate = kendo.template($("#attributeDetails").html());
     var attributeDetails = detailRow.find(".attributeDetails");
-    var firstAttribute = subkeyID.data("kendoDropDownList").dataItem(0); // e.data.attributes[0] can't be used as dates are not mapped
+    var firstAttribute = attributeTag.data("kendoDropDownList").dataItem(0); // e.data.attributes[0] can't be used as dates are not mapped
+    console.log(firstAttribute);
     if (firstAttribute) {
-      subkeyDetails.html(attributeTemplate(firstAttribute));
+      attributeDetails.html(attributeTemplate(firstAttribute));
     } else {
-      subkeyDetails.html('<li>No attributes available</li>');
+      attributeDetails.html('<em>No attributes available</em>');
     }
 
     function onAttributeSelect(e) {
