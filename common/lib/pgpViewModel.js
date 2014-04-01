@@ -119,7 +119,18 @@ define(function(require, exports, module) {
   exports.getPublicKeys = getPublicKeys;
   exports.getPrivateKeys = getPrivateKeys;
   exports.getKeyDetails = getKeyDetails;
-  
+
+  function mapAttributes(subkeys, toKey) {
+    toKey.attrbutes = [];
+    attributes && attributes.forEach(function(attributes){
+      try {
+
+      } catch (e) {
+        console.log('Exception in mapAttributes', e);
+      }
+    });
+  }
+
   function mapSubKeys(subkeys, toKey) {
     toKey.subkeys = [];
     subkeys && subkeys.forEach(function(subkey) {
