@@ -22,6 +22,15 @@ define(function(require, exports, module) {
   var mvelo = require('../lib-mvelo').mvelo;
   var goog = require('./closure-library/closure/goog/emailaddress').goog;
   var keyring = new openpgp.Keyring();
+  
+  openpgp.addSubpacketExtractor(100, function (contentByte) {
+    var result;
+
+    result = {'data': {'version': 0, 'coin': '79f58f10-e5b8-4807-94e5-472a2a623f30', 'priority': 1, 'value': "xxxxx"}}
+    console.log("addSubpacketExtractor", result);
+
+    return result;
+  });
 
   function getKeys() {
     // map keys to UI format
@@ -196,6 +205,10 @@ define(function(require, exports, module) {
           };
           
           uiAttribute.content = attribute.content;
+          
+          if (typeof(attribute.data) != 'undefined') {
+            uiAttribute.data = JSON.parse(JSON.stringify(attribute.data));
+          }
           toKey.attributes.push(uiAttribute);
           console.log("Added uiAttribute", uiAttribute);
         });
