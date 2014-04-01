@@ -146,8 +146,8 @@
                       <div class="attributes">
                         <div><label>Tag:</label><input class="attributeTag" /></li></div>
                         <div><label>Content:</label></div>
-                        <ul class="attributeDetails well">
-                        </ul>
+                        <div class="attributeDetails well">
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -158,6 +158,9 @@
                   <li><label>Creation Date:</label>#= crDate #</li>
                   <li><label>Expiration Date:</label>#= exDate #</li>
                   <li><label>Fingerprint:</label>#= fingerprint.match(/.{1,4}/g).join(' ') #</li>
+                </script>
+                <script type="text/x-kendo-template" id="attributeDetails">
+                  #= content #
                 </script>
               </div>
               <div class="modal fade hide" id="exportKey">
