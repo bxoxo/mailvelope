@@ -496,18 +496,6 @@ define(function(require, exports, module) {
     }
   }
 
-  function verifyMessage(message, pubKey, callback) {
-    try {
-      var result = openpgp.verifyClearSignedMessage([pubKey], message);
-      callback(null, result);
-    } catch (e) {
-      callback({
-        type: 'error',
-        message: 'Could not verify this message'
-      });
-    }
-  }
-
   function getWatchList() {
     return mvelo.storage.get('mailvelopeWatchList');
   }
@@ -533,7 +521,6 @@ define(function(require, exports, module) {
   exports.unlockKey = unlockKey;
   exports.encryptMessage = encryptMessage;
   exports.signMessage = signMessage;
-  exports.signMessage = verifyMessage;
   exports.getWatchList = getWatchList;
   exports.setWatchList = setWatchList;
   exports.getHostname = getHostname;

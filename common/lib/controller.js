@@ -299,11 +299,6 @@ define(function (require, exports, module) {
           model.signMessage(msg.data, messageBuffer[id].key, function(err, msg) {
             eFramePorts[id].postMessage({event: 'signed-message', message: msg});
           });
-        } else if (msg.action === 'verify') {
-          // TODO swap `messageBuffer[id].key` with pubKey
-          model.verifyMessage(msg.data, messageBuffer[id].key, function(err, msg) {
-            eFramePorts[id].postMessage({event: 'verified-message', message: msg});
-          });
         } else {
           throw new Error('Unknown eframe action:', msg.action);
         }
