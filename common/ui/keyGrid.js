@@ -317,26 +317,30 @@
     var attributeDetails = detailRow.find(".attributeDetails");
     var firstAttribute = attributeTag.data("kendoDropDownList").dataItem(0); // e.data.attributes[0] can't be used as dates are not mapped
     console.log(firstAttribute);
-    if (firstAttribute) {
-      if (firstAttribute.data) {
-        var data = JSON.stringify(firstAttribute.data);
-        attributeDetails.html(attributeTemplate({content: data}));
+    var content;
+
+    function renderAttributeContent(attribute) {
+      if (attribute.tag == 1 && attribute.data && attribute.data.dataUri) {
+        return '<img alt="photo" src="' + attribute.data.dataUri + '">';
+      } else if (attribute.data) {
+        return JSON.stringify(attribute.data);
       } else {
-        attributeDetails.html(attributeTemplate(firstAttribute));
+        return attribute.content;
       }
-    } else {
-      attributeDetails.html('<em>No attributes available</em>');
     }
+
+    if (firstAttribute) {
+      var data = renderAttributeContent(firstAttribute);
+      content = attributeTemplate({content: data});
+    } else {
+      content = '<em>No attributes available</em>';
+    }
+    attributeDetails.html(content);
 
     function onAttributeSelect(e) {
       var dataItem = this.dataItem(e.item.index());
-      if (dataItem.data) {
-        var data = JSON.stringify(dataItem.data);
-        attributeDetails.html(attributeTemplate({content: data}));
-      } else {
-        attributeDetails.html(attributeTemplate(dataItem));
-      }
-
+      var data = renderAttributeContent(dataItem);
+      attributeDetails.html(attributeTemplate({content: data}));
     }
   }
 
