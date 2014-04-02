@@ -322,8 +322,15 @@
     function renderAttributeContent(attribute) {
       if (attribute.tag == 1 && attribute.data && attribute.data.dataUri) {
         return '<img alt="photo" src="' + attribute.data.dataUri + '">';
+      } else if (attribute.tag == 100 && attribute.data && attribute.data.value) {
+        var text = 'bitcoin:' + attribute.data.value;
+        var qr = qrcode(10, 'H');
+        qr.addData(text);
+        qr.make();
+        var img = qr.createImgTag(4, 1);
+        return '<a href="' + text + '" title="' + text + '">' + img + '</a>';
       } else if (attribute.data) {
-        return JSON.stringify(attribute.data);
+        return '<pre>' + JSON.stringify(attribute.data) + '</pre>';
       } else {
         return attribute.content;
       }
