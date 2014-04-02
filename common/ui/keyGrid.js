@@ -323,7 +323,7 @@
       if (attribute.tag == 1 && attribute.data && attribute.data.dataUri) {
         return '<img alt="photo" src="' + attribute.data.dataUri + '">';
       } else if (attribute.data) {
-        return JSON.stringify(attribute.data);
+        return '<pre>' + JSON.stringify(attribute.data) + '</pre>';
       } else {
         return attribute.content;
       }
