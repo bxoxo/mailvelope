@@ -319,11 +319,53 @@
     console.log(firstAttribute);
     var content;
 
+    function bytesToHex (bytes) {
+      //  code taken from https://code.google.com/p/crypto-js/source/browse/branches/2.0.x/src/Crypto.js?spec=svn301&r=301#61
+      for (var hex = [], i = 0; i < bytes.length; i++) {
+        hex.push((bytes[i] >>> 4).toString(16));
+        hex.push((bytes[i] & 0xF).toString(16));
+      }
+      return hex.join("");
+    }
+
+    function base58_encode(bytes) {
+      var alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+      var base = new BigInteger("58", 10);
+
+      var positions = {};
+      for (var i=0; i<alphabet.length; ++i) {
+        positions[alphabet[i]] = i;
+      }
+
+      var bi = new BigInteger(bytesToHex(bytes), 16);
+      var chars = [];
+
+      while (bi.compareTo(base) >= 0) {
+        var mod = bi.mod(base);
+        chars.push(alphabet[mod.intValue()]);
+        bi = bi.subtract(mod).divide(base);
+      }
+
+      chars.push(alphabet[bi.intValue()]);
+
+      // Convert leading zeros too.
+      for (var i=0; i<bytes.length; i++) {
+        if (bytes[i] === 0) {
+          chars.push(alphabet[0]);
+        } else {
+          break;
+        }
+      }
+
+      return chars.reverse().join('');
+    }
+
     function renderAttributeContent(attribute) {
       if (attribute.tag == 1 && attribute.data && attribute.data.dataUri) {
         return '<img alt="photo" src="' + attribute.data.dataUri + '">';
       } else if (attribute.tag == 100 && attribute.data && attribute.data.coin) {
         var coin;
+        var address = base58_encode(attribute.data.value);
         switch (attribute.data.coin) {
           case '79f58f10-e5b8-4807-94e5-472a2a623f30':
             coin = 'bitcoin';
@@ -331,7 +373,8 @@
           default:
             coin = 'unknown';
         }
-        var text = coin + ':' + attribute.data.value;
+        
+        var text = coin + ':' + address;
         var qr = qrcode(10, 'H');
         qr.addData(text);
         qr.make();
