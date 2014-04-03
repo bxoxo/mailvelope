@@ -22,7 +22,7 @@ define(function(require, exports, module) {
   var mvelo = require('../lib-mvelo').mvelo;
   var goog = require('./closure-library/closure/goog/emailaddress').goog;
   var keyring = new openpgp.Keyring();
-  
+
 
   openpgp.addSubpacketExtractor(1, function (contentBytes) {
     function base64_encode(data) {
@@ -72,13 +72,13 @@ define(function(require, exports, module) {
 
       return (r ? enc.slice(0, r - 3) : enc) + '==='.slice(r || 3);
     }
-  
+
     var result;
 
     result = {
       'dataUri': "data:image/jpg;charset=utf-8;base64," + base64_encode(contentBytes.substring(16))
     }
-  
+
     return {'data': result};
   });
 
@@ -87,12 +87,12 @@ define(function(require, exports, module) {
       //  code taken from http://stackoverflow.com/a/1242596
       var ch, st, re = [];
       for (var i = 0; i < str.length; i++ ) {
-        ch = str.charCodeAt(i);  // get char 
+        ch = str.charCodeAt(i);  // get char
         st = [];                 // set up "stack"
         do {
           st.push( ch & 0xFF );  // push byte to stack
           ch = ch >> 8;          // shift value down by 1 byte
-        }  
+        }
         while ( ch );
         // add stack contents to result
         // done because chars have "wrong" endianness
@@ -111,7 +111,7 @@ define(function(require, exports, module) {
 
       return value;
     };
-  
+
     function bytesToHex (bytes) {
       //  code taken from https://code.google.com/p/crypto-js/source/browse/branches/2.0.x/src/Crypto.js?spec=svn301&r=301#61
       for (var hex = [], i = 0; i < bytes.length; i++) {
@@ -123,7 +123,7 @@ define(function(require, exports, module) {
 
     var bytes = stringToBytes(contentBytes);
     var result;
-  
+
     result = {
       'version': bytes[0],
       'priority': byteArrayToLong(bytes.slice(5, 9)),
@@ -305,9 +305,9 @@ define(function(require, exports, module) {
           } else {
             uiAttribute.tagName = "Unknown";
           };
-          
+
           uiAttribute.content = attribute.content;
-          
+
           if (typeof(attribute.data) != 'undefined') {
             uiAttribute.data = JSON.parse(JSON.stringify(attribute.data));
           }
