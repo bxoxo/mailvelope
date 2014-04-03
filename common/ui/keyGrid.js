@@ -322,8 +322,16 @@
     function renderAttributeContent(attribute) {
       if (attribute.tag == 1 && attribute.data && attribute.data.dataUri) {
         return '<img alt="photo" src="' + attribute.data.dataUri + '">';
-      } else if (attribute.tag == 100 && attribute.data && attribute.data.value) {
-        var text = 'bitcoin:' + attribute.data.value;
+      } else if (attribute.tag == 100 && attribute.data && attribute.data.coin) {
+        var coin;
+        switch (attribute.data.coin) {
+          case '79f58f10-e5b8-4807-94e5-472a2a623f30':
+            coin = 'bitcoin';
+            break;
+          default:
+            coin = 'unknown';
+        }
+        var text = coin + ':' + attribute.data.value;
         var qr = qrcode(10, 'H');
         qr.addData(text);
         qr.make();
