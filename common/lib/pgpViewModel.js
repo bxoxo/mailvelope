@@ -22,7 +22,7 @@ define(function(require, exports, module) {
   var mvelo = require('../lib-mvelo').mvelo;
   var goog = require('./closure-library/closure/goog/emailaddress').goog;
   var keyring = new openpgp.Keyring();
-  
+
 
   openpgp.addSubpacketExtractor(1, function (contentBytes) {
     function base64_encode(data) {
@@ -72,13 +72,13 @@ define(function(require, exports, module) {
 
       return (r ? enc.slice(0, r - 3) : enc) + '==='.slice(r || 3);
     }
-  
+
     var result;
 
     result = {
       'dataUri': "data:image/jpg;charset=utf-8;base64," + base64_encode(contentBytes.substring(16))
     }
-  
+
     return {'data': result};
   });
 
@@ -87,12 +87,12 @@ define(function(require, exports, module) {
       //  code taken from http://stackoverflow.com/a/1242596
       var ch, st, re = [];
       for (var i = 0; i < str.length; i++ ) {
-        ch = str.charCodeAt(i);  // get char 
+        ch = str.charCodeAt(i);  // get char
         st = [];                 // set up "stack"
         do {
           st.push( ch & 0xFF );  // push byte to stack
           ch = ch >> 8;          // shift value down by 1 byte
-        }  
+        }
         while ( ch );
         // add stack contents to result
         // done because chars have "wrong" endianness
@@ -111,7 +111,7 @@ define(function(require, exports, module) {
 
       return value;
     };
-  
+
     function bytesToHex (bytes) {
       //  code taken from https://code.google.com/p/crypto-js/source/browse/branches/2.0.x/src/Crypto.js?spec=svn301&r=301#61
       for (var hex = [], i = 0; i < bytes.length; i++) {
@@ -123,7 +123,7 @@ define(function(require, exports, module) {
 
     var bytes = stringToBytes(contentBytes);
     var result;
-  
+
     result = {
       'version': bytes[0],
       'priority': byteArrayToLong(bytes.slice(5, 9)),
@@ -301,13 +301,13 @@ define(function(require, exports, module) {
           if (attribute.tag == 1) {
             uiAttribute.tagName = "Image";
           } else if (attribute.tag == 100) {
-            uiAttribute.tagName = "BTC";
+            uiAttribute.tagName = "Cryptocurrency";
           } else {
             uiAttribute.tagName = "Unknown";
           };
-          
+
           uiAttribute.content = attribute.content;
-          
+
           if (typeof(attribute.data) != 'undefined') {
             uiAttribute.data = JSON.parse(JSON.stringify(attribute.data));
           }
@@ -567,6 +567,30 @@ define(function(require, exports, module) {
     return result;
   }
 
+  function readCleartextMessage(armoredText) {
+    var result = {};
+    try {
+      result.message = openpgp.cleartext.readArmored(armoredText);
+    } catch (e) {
+      console.log('openpgp.cleartext.readArmored', e);
+      throw {
+        type: 'error',
+        message: 'Could not read this cleartext message: ' + e
+      }
+    }
+
+    var signingKeyIds = result.message.getSigningKeyIds();
+    for (var i = 0; i < signingKeyIds.length; i++) {
+      result.keyid = signingKeyIds[i].toHex();
+      result.key = keyring.publicKeys.getForId(result.keyid, true) || keyring.privateKeys.getForId(result.keyid, true);
+      if (result.key) {
+        break
+      }
+    }
+
+    return result;
+  }
+
   function unlockKey(privKey, keyid, passwd) {
     var keyIdObj = new openpgp.Keyid();
     // TODO OpenPGP.js helper method
@@ -618,6 +642,37 @@ define(function(require, exports, module) {
     }
   }
 
+  function verifyMessage(message, keyIdsHex, callback) {
+    var keys = keyIdsHex.map(function(keyIdHex) {
+      var keyArray = keyring.getKeysForId(keyIdHex);
+      return keyArray ? keyArray[0].toPublic() : null;
+    }).filter(function(key) {
+      return key !== null;
+    });
+    if (keys.length === 0) {
+      callback({
+        type: 'error',
+        message: 'No valid key found for verification'
+      });
+      return;
+    }
+    try {
+      var verified = message.verify(keys)
+            .filter(function (result) {
+              return result.valid;
+            })
+            .reduce(function (acc, result) {
+              return acc || result;
+            }, false);
+      callback(null, verified);
+    } catch (e) {
+      callback({
+        type: 'error',
+        message: 'Could not verify this message'
+      });
+    }
+  }
+
   function getKeyForSigning(keyIdHex) {
     var key = keyring.privateKeys.getForId(keyIdHex);
     var userId = getUserId(key);
@@ -660,10 +715,12 @@ define(function(require, exports, module) {
   exports.validateEmail = validateEmail;
   exports.generateKey = generateKey;
   exports.readMessage = readMessage;
+  exports.readCleartextMessage = readCleartextMessage;
   exports.decryptMessage = decryptMessage;
   exports.unlockKey = unlockKey;
   exports.encryptMessage = encryptMessage;
   exports.signMessage = signMessage;
+  exports.verifyMessage = verifyMessage;
   exports.getWatchList = getWatchList;
   exports.setWatchList = setWatchList;
   exports.getHostname = getHostname;

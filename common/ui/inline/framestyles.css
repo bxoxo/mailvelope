@@ -3,6 +3,10 @@
  * Copyright (C) 2012  Thomas Oberndörfer
  */
 
+:root .m-frame-wrapper {
+    position: relative;
+}
+
 :root .m-extract-frame {
   background-position: center center, center center;
   background-image: none, none;
@@ -13,13 +17,29 @@
   border-radius: 3px;
   box-shadow: 0 1px 2px rgba(0,0,0,.1);
   position: absolute;
-  top: 0;
+  top: 0px;
+  height: 100%;
+  width: 100%;
   z-index: 1;
   display: none;
 }
 
 :root .m-extract-frame.m-decrypt {
   background-image: url('../../img/mail_locked_96.png'), none;
+}
+
+:root .m-extract-frame.m-verify {
+  background-image: url('../../img/mail_signed_96.png'), none;
+  background-size: 64px, 64px;
+  height: 96px;
+  width: 96px;
+  top: initial;
+  bottom: 0px;
+}
+
+:root .m-extract-frame.m-verify.m-open {
+  height: 100%;
+  width: 100%;
 }
 
 :root .m-extract-frame.m-import {
@@ -114,6 +134,10 @@
 
 :root .m-decrypt.m-cursor {
   cursor: url('../../img/key-24.png'), auto;
+}
+
+:root .m-verify.m-cursor {
+  cursor: url('../../img/ok48.png'), auto;
 }
 
 :root .m-import.m-cursor {
