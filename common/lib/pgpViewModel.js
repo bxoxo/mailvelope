@@ -301,7 +301,7 @@ define(function(require, exports, module) {
           if (attribute.tag == 1) {
             uiAttribute.tagName = "Image";
           } else if (attribute.tag == 100) {
-            uiAttribute.tagName = "BTC";
+            uiAttribute.tagName = "Cryptocurrency";
           } else {
             uiAttribute.tagName = "Unknown";
           };
