@@ -15,27 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var DecryptFrame = DecryptFrame || (function() {
+var VerifyFrame = VerifyFrame || (function () {
 
-  var decryptFrame = function(prefs) {
+  var verifyFrame = function (prefs) {
     ExtractFrame.call(this, prefs);
     this._displayMode = prefs.security.display_decrypted;
-    this._dDialog = null;
-    // decrypt popup active
-    this._dPopup = false;
-    this._ctrlName = 'dFrame-' + this.id;
-    this._typeRegex = /-----BEGIN PGP MESSAGE-----[\s\S]+?-----END PGP MESSAGE-----/;
+    this._vDialog = null;
+    // verify popup active
+    this._vPopup = false;
+    this._ctrlName = 'vFrame-' + this.id;
+    this._typeRegex = /-----BEGIN PGP SIGNED MESSAGE-----[\s\S]+?-----END PGP SIGNATURE-----/;
   };
 
-  decryptFrame.prototype = Object.create(ExtractFrame.prototype);
-  decryptFrame.prototype.parent = ExtractFrame.prototype;
+  verifyFrame.prototype = Object.create(ExtractFrame.prototype);
+  verifyFrame.prototype.parent = ExtractFrame.prototype;
 
-  decryptFrame.prototype._renderFrame = function() {
+  verifyFrame.prototype._renderFrame = function () {
     this.parent._renderFrame.call(this);
-    this._eFrame.addClass('m-decrypt');
+    this._eFrame.addClass('m-verify');
   };
 
-  decryptFrame.prototype._clickHandler = function() {
+  verifyFrame.prototype._clickHandler = function () {
     this.parent._clickHandler.call(this);
     if (this._displayMode == mvelo.DISPLAY_INLINE) {
       this._inlineDialog();
@@ -45,62 +45,61 @@ var DecryptFrame = DecryptFrame || (function() {
     return false;
   };
 
-  decryptFrame.prototype._inlineDialog = function() {
-    this._dDialog = $('<iframe/>', {
-      id: 'dDialog-' + this.id,
+  verifyFrame.prototype._inlineDialog = function () {
+    this._vDialog = $('<iframe/>', {
+      id: 'vDialog-' + this.id,
       'class': 'm-frame-dialog',
       frameBorder: 0,
       scrolling: 'no'
     });
-    var path = 'common/ui/inline/dialogs/decryptInline.html?id=' + this.id;
+    var path = 'common/ui/inline/dialogs/verifyInline.html?id=' + this.id;
     var url = mvelo.extension.getURL(path);
     if (mvelo.ffa) {
       url = 'about:blank';
     }
-    this._dDialog.attr('src', url);
-    this._eFrame.append(this._dDialog);
-    this._dDialog.fadeIn();
+    this._vDialog.attr('src', url);
+    this._eFrame.append(this._vDialog);
+    this._vDialog.fadeIn();
   };
 
-  decryptFrame.prototype._popupDialog = function() {
+  verifyFrame.prototype._popupDialog = function () {
     this._port.postMessage({
-      event: 'dframe-display-popup',
+      event: 'vframe-display-popup',
       sender: this._ctrlName
     });
     this._dPopup = true;
   };
 
-  decryptFrame.prototype._removeDialog = function() {
+  verifyFrame.prototype._removeDialog = function () {
     // check if dialog is active
-    if (!this._dDialog && !this._dPopup) {
+    if (!this._vDialog && !this._vPopup) {
       return;
     }
     if (this._displayMode === mvelo.DISPLAY_INLINE) {
-      this._dDialog.fadeOut();
+      this._vDialog.fadeOut();
       // removal triggers disconnect event
-      this._dDialog.remove();
-      this._dDialog = null;
+      this._vDialog.remove();
+      this._vDialog = null;
     } else {
-      this._dPopup = false;
+      this._vPopup = false;
     }
     this._eFrame.addClass('m-cursor');
-    this._toggleIcon();
+    this._eFrame.removeClass('m-open');
     this._eFrame.on('click', this._clickHandler.bind(this));
   };
 
-  decryptFrame.prototype._registerEventListener = function() {
+  verifyFrame.prototype._registerEventListener = function () {
     this.parent._registerEventListener.call(this);
     var that = this;
-    this._port.onMessage.addListener(function(msg) {
+    this._port.onMessage.addListener(function (msg) {
       //console.log('dFrame-%s event %s received', that.id, msg.event);
       switch (msg.event) {
         case 'remove-dialog':
-        case 'dialog-cancel':
           that._removeDialog();
           break;
         case 'armored-message':
           that._port.postMessage({
-            event: 'dframe-armored-message',
+            event: 'vframe-armored-message',
             data: that._getArmoredMessage(),
             sender: that._ctrlName
           });
@@ -109,6 +108,6 @@ var DecryptFrame = DecryptFrame || (function() {
     });
   };
 
-  return decryptFrame;
+  return verifyFrame;
 
 }());
